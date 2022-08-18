@@ -1,0 +1,151 @@
+// ES6 extends class
+
+console.clear();
+
+class Page {
+  goto() {
+    console.log('Im going to anoter page');
+  };
+  setCookie() {
+    console.log('Im setting a cookie');
+  };
+};
+
+// easy way
+class CustomPage2 extends Page {
+  login() {
+    console.log('All of our login logics');
+  };
+};
+
+const CP = new CustomPage2;
+CP.login();
+
+
+// Es6 added way
+class CustomPage {
+  constructor(page) {
+    this.page = page;
+  }
+
+  login() {
+    this.page.goto('localhost:3000');
+    this.page.setCookie();
+  }
+
+  goto() {
+    this.page.goto();
+  }
+};
+
+// const page = browser.launch();
+const page = new Page();
+const customPage = new CustomPage(page);
+customPage.login();
+customPage.page.goto();
+customPage.page.setCookie();
+
+// 여기서 .page 를 없애고 싶다!
+
+
+
+// 이게 프록시입니다!
+
+console.clear();
+
+class Greetings {
+  english() { return 'Hello'; };
+  spanish() { return 'Hola'; }
+};
+
+class MoreGreetings {
+  german () { return 'Hallo'; }
+  french() { return 'bonjour'; }
+};
+
+const greetings = new Greetings();
+const moreGreetings = new MoreGreetings();
+
+console.log(greetings.english());
+
+// 1 arg: target , 2 args: handler
+const allGreetings = new Proxy(moreGreetings, {
+  get : function(target, property) {    // target refer moreGreetings class
+    console.log('property: ', property);
+    
+    return moreGreetings[property] || greetings[property]
+  }
+});
+
+// allGreetings.EvenPropertiesThatDontExist
+console.log(allGreetings.german());
+console.log(allGreetings.english);
+
+
+// 그럼 이제 첫 케이스를 다시 해보자면
+console.clear();
+
+class Page {
+  goto() { console.log('Im going to anoter page'); };
+  setCookie() {  console.log('Im setting a cookie'); };
+};
+
+class CustomPage {
+  constructor(page) {
+    this.page = page;
+  }
+
+  login() {
+    this.page.goto('localhost:3000');
+    this.page.setCookie();
+  }
+};
+
+const page = new Page();
+const customPage = new CustomPage(page);
+
+const superPage = new Proxy(customPage, {
+  get : function(target, property) {
+    
+    return target[property] || page[property];
+  }
+});
+
+superPage.goto();
+superPage.setCookie();
+superPage.login();
+
+
+// 한단계 더 나가보면 static 으로 내장시켜버리는것
+
+class CustomPage {
+  constructor(page) {
+    this.page = page;
+  };
+
+
+  static build () {
+    const page = new Page();
+    const customPage = new CustomPage(page);
+
+    const superPage = new Proxy(customPage, {
+      get : function(target, property) {
+
+        return target[property] || page[property];
+      }
+    });
+
+    return superPage;
+  };
+
+
+  login() {
+    this.page.goto('localhost:3000');
+    this.page.setCookie();
+  }
+};
+
+
+const superPage = CustomPage.build();
+superPage.login();
+superPage.goto();

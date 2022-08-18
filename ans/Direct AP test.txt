@@ -1,0 +1,36 @@
+// Temporary file to create a new blog post
+
+// axios.post('/blog/posts')... 대신에 이걸 쓸겁니다??
+// fetch : 브라우저 내장 함수인듯??
+fetch('/api/blogs', {
+  method : 'POST',
+  credentials : 'same-origin',
+  headers : {
+    'Content-Type' : 'application/json',
+  },
+  body : JSON.stringify({
+    title : 'My Title',
+    content : 'My Content',
+  })
+});
+
+
+fetch('/api/blogs', {
+  method : 'POST',
+  credentials : 'same-origin',
+  headers : {
+    'Content-Type' : 'application/json',
+  },
+  body : JSON.stringify({ title : 'My Other Title2', content : 'My Other Content2' })
+});   
+
+() => {
+  fetch('/api/blogs', {
+    method : 'POST',
+    credentials : 'same-origin',
+    headers : {
+      'Content-Type' : 'application/json',
+    },
+    body : JSON.stringify({ title : 'My Other Title2', content : 'My Other Content2' })
+  });  
+}

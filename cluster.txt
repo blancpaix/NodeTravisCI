@@ -1,0 +1,37 @@
+싱글스레드 만회하기 위해서 일단 클러스터를 도입해서 사용할 계정
+클러스터로 여러개의 싱글 스레드를 두어 성능을 향상시킨다?
+
+while 같은 것들은 사용을 최소화 시키는게 좋을듯?
+
+
+benchmark
+뭐를 쓸거니? 일단 따라가봅시다
+아파치 벤치마크 프로그램이 따로 있네
+이거 apachelounge 여기서 다운로드 받아서 환경변수 설정해주면 됨
+ab 나는 이런거 없음 맥에서는 가능한데 이거를 리눅스에서는 가능하구나.. 유닉스?
+ab -c 50 -n 500 localhost:3000/fast
+
+
+1 thread 1 child => one req with  the concurrency of one
+ab -c 1 -n 1 localhost:3000/
+// two req at the same time
+ab -c 2 -n 2 localhost:3000/
+
+여기서는 pm2 사용할거임
+
+  pm2 config
+
+  pm2 start index.js -i 0
+  // -i : 인스턴스 개수, 로직 cpu 개수
+  0 이면 실제로 로직 코어 개수랑 일치하게 실행시켜줌
+  나는 4개를 실행시켜줌
+
+  pm2 delete index
+
+  pm2 list l
+
+  pm2 show index
+
+  pm2 monit
+
+npm install webworker-threads 이거 설치가 안되서 그냥 강의만 보고 넘기지 뭐...

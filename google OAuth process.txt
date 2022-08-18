@@ -1,0 +1,83 @@
+express 에서 작업르 하네...
+미들웨어를 바꾸는거 같은데/
+passport.google Auth 이거를 바꾸는거지?
+
+passport 에서 설정을 ㅎ재누느거임
+
+그럼 로그인 프롤우가 이런식으로 됨?
+post / id With password
+그러면 리턴으로
+redirect back / auth/google/callback/
+
+로그인을 하려면 
+/auth/google 로 향함
+그리고 구글에서 콜백으로 서버에 /auth/google/callback 으로 데이터 전송
+그 데이터를 기반으로 유저 정보 요청, 
+구글에서 정보 전송
+이제 노드에서 쿠키 설정됨 ---이 부분만 우리가 건들것...
+fake session 을 만들어버려서 서버에서 사용을 허용해주는거라서...
+그러면 구글을 거치는 과정을 생략시켜버리는거임
+
+구글에서 넘어오는 데이터
+http://localhost:3000/auth/google/callback?code=4%2F0AdQt8qh9wZULOrqYSggN9qBPf4lhlnrvQMeu6ZI-aoymydp0zc5zMnlf3jYO1M6vuyq34A&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent
+
+set-cookie: session=eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19; path=/; expires=Thu, 15 Sep 2022 07:45:33 GMT; httponly
+eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19 이거르 복제해서 쓸건데..
+set-cookie: session.sig=YUJYt77ckZZXWU2senQkBrSxBSM; path=/; expires=Thu, 15 Sep 2022 07:45:33 GMT; httponly
+두개의 세션은 뭘 의미를 하는가?
+
+> const session = 'eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19';
+undefined
+> const Buffer = require('safe-buffer').Buffer;
+undefined
+> Buffer.from(session, 'base64').toString('utf8');
+'{"passport":{"user":"62f0dd5155f5ee336c1eedfa"}}'
+이게 서버에 저장되는 실제 세션임
+
+아니지 실제로는 몽고DB 에 저장되고 있음
+그러면 이게... DB 에 저장되는것을 확인해서 알고있다는건가??
+
+session
+session.sig 이건 뭘 의미를 함?
+
+session 은 request session 객체에 할당됨
+req.session === { passport : {user : 'blablabla' }};
+
+session.sig 는 cookie-session 에서 관장함 = signature
+Cookie-session
+  => Pulls properties 'session' and 'session.sig' off cookie 
+  => Uses 'session.sig' to ensure 'session wasn't maipulated
+  => Decode 'session' into JS object
+  => Place that object on 'req.session'
+
+
+  base 64 Session
+    eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19
+  + Cookie signing Key (private key) ==>> 이게 cookie Key 로 지정하는 값임
+  = Session Signature
+
+
+= Sample test =
+
+set-cookie: session=eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19;
+ path=/;
+ expires=Thu, 15 Sep 2022 14:15:32 GMT;
+ httponly
+
+set-cookie: session.sig=YUJYt77ckZZXWU2senQkBrSxBSM;
+ path=/;
+ expires=Thu, 15 Sep 2022 14:15:32 GMT;
+ httponly
+
+const session = 'eyJwYXNzcG9ydCI6eyJ1c2VyIjoiNjJmMGRkNTE1NWY1ZWUzMzZjMWVlZGZhIn19';
+const Keygrip = require('keygrip');
+const keygrip = new Keygrip(['123123123']);
+keygrip.sign('session=' + session);
+> 'YUJYt77ckZZXWU2senQkBrSxBSM'
+
+keygrip.verify('session=' + session, 'YUJYt77ckZZXWU2senQkBrSxBSM');
+> true
+
+keygrip.verify('session=' + session, 'sampletest');
+> false
+

@@ -1,0 +1,59 @@
+== Reference : docs.travis-ci.com
+
+To Setup CI, You'll node_modules
+Github Account
+Basic Git knowledge
+patience for a lot of boring configuration
+
+
+Travis CI
+circle CI
+codeshipt
+AWS codebuild
+
+CI flow
+  1. 깃허브에 코드 푸시
+  2. 트래비스가 자동적으로 코드 변경을 감지
+  3. 트래비스가 프로젝트를 클론
+  4. 트래비스에서 .travis.yml 을 이용해 테스트 실행
+  5. 테스트가 정상적으로 완료되면 우리에게 이메일 보냄
+
+
+travis 서버에 그러면 모든 서비스가 로컬에서 구현이 되어있어야 함
+redis, mongo 이런게 한 서버에 같이 올라가있어야 한다는거네?
+
+cache : 
+  node_modules 재사용
+
+install
+  실행할 구문
+
+
+package.json
+"build": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+--prefix ?? : go to the client directory
+npm run --prefix [path]
+
+
+nohup : if the shell is closed, don't kill anything this command creates
+cal : calender
+sleep 3 : 3seconds
+이거한다고 서비스 실행까지 됨?? 단 3초만에?
+
+
+
+how to connect mongo, Redis server in CI server?
+in homepage you can find 'installing dependencies'
+'setting up services and databases'
+MongoDB, REDIS, ...
+
+
+More server configuration
+1. Add ci.js key file
+2. Fix redis URL in services/cache.js
+3. Add redis URl tot dev.js and ci.js
+4. Add mongoDB URI to ci.js
+5. Make sure server starts on port 3000 in CI mode
+6. Make sure server serves react client files in CI mode
+
+

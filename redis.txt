@@ -1,0 +1,59 @@
+redis 시작 커맨드
+sudo service redis-server start
+redis-cli
+ping : test
+
+const { hasUncaughtExceptionCaptureCallback } = require("process");
+const { rootCertificates } = require("tls");
+
+REDIS
+
+hset // : set value in hash
+hset('spanish', 'red', 'rojo');
+
+hget('spanish', 'red', (err, value) => {
+  console.log(value); // rojo
+});
+
+const redisValues = {
+  hi: 'there'
+};
+
+const redisValue = {
+  spanish: {
+    red: 'rojo',
+    orange: 'naranja',
+    blue: 'zaul'
+  },
+  german: {
+    red: rootCertificates,
+    orange: 'orange',
+    blue: 'blau'
+  }
+};
+
+gotcha... 가 존재한답니다.
+순수한 JSON 은 redis 에 저장할 수 없음...
+client.set('colors', { red: 'rojo' });
+client.get('colors') return [object Object];
+
+client.set('colors', JSON.stringify({ red: 'rojo' }));
+client.get('colors', console.log);
+client.get('colors', (err, val) => console.log(JSON.parse(val)));
+ => { red : 'rojo' }
+
+
+= Cache Keys
+
+key = query
+value = result of query
+
+client.flushall() 
+// wipe every data in redis
+
+Expire 설정 3번째 파라미터 4번재 파라미터 : 지속 시간 (second)
+client.set('color', 'red', 'EX', 5)
+client.get('color', console.log);
+
+client.del(key);
+특정 키 삭제
